@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -29,16 +29,23 @@ def get_posts():
 @app.get('/posts/{id}')
 def get_posts_id(id: int):
     print('here')
-    try:
-        result = database[id]
-        return result
-    except KeyError:
-        return f"Key not found in: {database}"
+    if id not in database:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Key {id} not found in: {database}")
+    return database[id]
 
 
-@app.post('/posts')
+@app.post('/posts', status_code=status.HTTP_201_CREATED)
 def create_posts(post: Post):
     global id
     database[id] = post.dict()
     id = id + 1
     return database
+
+
+@app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete(id: int):
+    if id not in database:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Key {id} not found in: {database}")
+    database.pop(id)
