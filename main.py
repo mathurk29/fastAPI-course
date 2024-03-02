@@ -1,8 +1,7 @@
 from fastapi import FastAPI
-
-from database_es import wsl_elasticsearch
-
 from routes import router
-app = FastAPI()
+import database_postgress
+import database_es
 
+app = FastAPI()
 app.include_router(router)

@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, status
 
-from database_es import wsl_elasticsearch
+# from database_es import wsl_elasticsearch
 from database_dict import database, idx
 from model import Post
 from fastapi import APIRouter
@@ -32,7 +32,7 @@ def create_posts(post: Post):
     global idx
     database[idx] = post.dict()
     idx = idx + 1
-    return database
+    return f'Your post is registered at index: {idx}'
 
 
 @ router.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -45,4 +45,8 @@ def delete(id: int):
 
 @ router.put("/posts/{id}", status_code=status.HTTP_201_CREATED)
 def update_post(id: int, post: Post):
-    return 'TBD'
+    if id not in database:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail='id not available in database.')
+    database[id].update(post.dict())
+    return database[id]
