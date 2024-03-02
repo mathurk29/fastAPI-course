@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, status
 
 # from database_es import wsl_elasticsearch
 from database_dict import database, idx
+from database_postgress import cur, conn
 from model import Post
 from fastapi import APIRouter
 
@@ -15,24 +16,25 @@ def root():
 
 @ router.get('/posts')
 def get_posts():
-    return database
+    cur.execute(''' SELECT * FROM posts''')
+    posts = cur.fetchall()
+    return posts
 
 
 @ router.get('/posts/{id}')
 def get_posts_id(id: int):
-    print('here')
-    if id not in database:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Key {id} not found in: {database}")
-    return database[id]
+    cur.execute('''SELECT * FROM posts WHERE id=%s''', (str(id)))
+    post = cur.fetchone()
+    return post
 
 
 @ router.post('/posts', status_code=status.HTTP_201_CREATED)
 def create_posts(post: Post):
-    global idx
-    database[idx] = post.dict()
-    idx = idx + 1
-    return f'Your post is registered at index: {idx}'
+    cur.execute(''' INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING id''',
+                (post.title, post.content, post.published))
+    idx = cur.fetchone()[0]
+    conn.commit()
+    return f'Your post is successfully registered at index: {idx}'
 
 
 @ router.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
