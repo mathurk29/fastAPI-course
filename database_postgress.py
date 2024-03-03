@@ -6,7 +6,10 @@ while True:
     try:
         # Connect to your postgres DB
         conn = psycopg2.connect(
-            database="fastapi", user="postgres", password="passwd", cursor_factory=DictCursor
+            database="fastapi",
+            user="postgres",
+            password="passwd",
+            cursor_factory=DictCursor,
         )
 
         # Open a cursor to perform database operations
