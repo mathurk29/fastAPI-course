@@ -1,9 +1,8 @@
-from fastapi import FastAPI, HTTPException, status
+from fastapi import HTTPException, status
 
 # from database_es import wsl_elasticsearch
-from database_dict import database, idx
-from database_postgress import cur, conn
-from model import Post
+from databases.database_postgress import postgres_cursor, postgres_connection
+from databases.model import Post
 from fastapi import APIRouter
 
 router = APIRouter()
@@ -16,16 +15,16 @@ def root():
 
 @router.get("/posts")
 def get_posts():
-    cur.execute(""" SELECT * FROM posts""")
-    posts = cur.fetchall()
+    postgres_cursor.execute(""" SELECT * FROM posts""")
+    posts = postgres_cursor.fetchall()
     return posts
 
 
 @router.get("/posts/{id}")
 def get_posts_id(id: int):
 
-    cur.execute("""SELECT * FROM posts WHERE id = %s""", (str(id),))
-    post = cur.fetchone()
+    postgres_cursor.execute("""SELECT * FROM posts WHERE id = %s""", (str(id),))
+    post = postgres_cursor.fetchone()
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -36,20 +35,22 @@ def get_posts_id(id: int):
 
 @router.post("/posts", status_code=status.HTTP_201_CREATED)
 def create_posts(post: Post):
-    cur.execute(
+    postgres_cursor.execute(
         """ INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING id""",
         (post.title, post.content, post.published),
     )
-    idx = cur.fetchone()[0]
-    conn.commit()
+    idx = postgres_cursor.fetchone()[0]
+    postgres_connection.commit()
     return f"Your post is successfully registered at index: {idx}"
 
 
 @router.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete(id: int):
-    cur.execute(""" DELETE FROM posts WHERE id = %s RETURNING id""", (str(id),))
-    deleted_post_id = cur.fetchone()[0]
-    conn.commit()
+    postgres_cursor.execute(
+        """ DELETE FROM posts WHERE id = %s RETURNING id""", (str(id),)
+    )
+    deleted_post_id = postgres_cursor.fetchone()[0]
+    postgres_connection.commit()
     if deleted_post_id is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -60,7 +61,7 @@ def delete(id: int):
 
 @router.put("/posts/{id}", status_code=status.HTTP_201_CREATED)
 def update_post(id: int, post: Post):
-    cur.execute(
+    postgres_cursor.execute(
         """ UPDATE posts SET title = %s, content = %s, published=%s WHERE id = %s RETURNING id""",
         (
             post.title,
@@ -69,8 +70,8 @@ def update_post(id: int, post: Post):
             str(id),
         ),
     )
-    updated_post_id = cur.fetchone()
-    conn.commit()
+    updated_post_id = postgres_cursor.fetchone()
+    postgres_connection.commit()
     if updated_post_id is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

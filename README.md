@@ -18,7 +18,7 @@ docker run --name es01 --net elastic -p 9200:9200 -it -m 1GB docker.elastic.co/e
 
 docker cp es01:/usr/share/elasticsearch/config/certs/http_ca.crt .
 
-export ELASTIC_PASSWORD="<put password here>"
+export ELASTIC_PASSWORD="<>"
 
 curl --cacert http_ca.crt -u elastic:$ELASTIC_PASSWORD https://localhost:9200
 

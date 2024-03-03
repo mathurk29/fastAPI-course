@@ -5,7 +5,7 @@ import time
 while True:
     try:
         # Connect to your postgres DB
-        conn = psycopg2.connect(
+        postgres_connection = psycopg2.connect(
             database="fastapi",
             user="postgres",
             password="passwd",
@@ -13,7 +13,7 @@ while True:
         )
 
         # Open a cursor to perform database operations
-        cur = conn.cursor()
+        postgres_cursor = postgres_connection.cursor()
         print("Postgress connected")
         break
 
@@ -23,7 +23,7 @@ while True:
         time.sleep(2)
 
 # Execute a query
-cur.execute("SELECT * FROM posts")
+postgres_cursor.execute("SELECT * FROM posts")
 
 # Retrieve query results
-records = cur.fetchall()
+records = postgres_cursor.fetchall()
