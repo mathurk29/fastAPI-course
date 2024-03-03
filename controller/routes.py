@@ -1,9 +1,7 @@
-from fastapi import HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 
 # from database_es import wsl_elasticsearch
-from databases.database_postgress import postgres_cursor, postgres_connection
-from databases.model import Post
-from fastapi import APIRouter
+from databases.model import PostsBase, postgres_connection, postgres_cursor
 
 router = APIRouter()
 
@@ -34,7 +32,7 @@ def get_posts_id(id: int):
 
 
 @router.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_posts(post: Post):
+def create_posts(post: PostsBase):
     postgres_cursor.execute(
         """ INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING id""",
         (post.title, post.content, post.published),
@@ -49,18 +47,18 @@ def delete(id: int):
     postgres_cursor.execute(
         """ DELETE FROM posts WHERE id = %s RETURNING id""", (str(id),)
     )
-    deleted_post_id = postgres_cursor.fetchone()[0]
-    postgres_connection.commit()
-    if deleted_post_id is None:
+    temp = postgres_cursor.fetchone()
+    if temp is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Post with {id} not found.",
         )
-    return f"Post at {deleted_post_id} removed successfully."
+    deleted_post_id = temp[0]
+    postgres_connection.commit()
 
 
 @router.put("/posts/{id}", status_code=status.HTTP_201_CREATED)
-def update_post(id: int, post: Post):
+def update_post(id: int, post: PostsBase):
     postgres_cursor.execute(
         """ UPDATE posts SET title = %s, content = %s, published=%s WHERE id = %s RETURNING id""",
         (

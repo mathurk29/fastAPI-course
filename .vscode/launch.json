@@ -25,7 +25,7 @@
             "type": "shell",
             "command": "source venv/Scripts/activate",
             "windows": {
-                "command": "path\\to\\your\\virtualenv\\Scripts\\activate.bat"
+                "command": "venv\\Scripts\\activate.bat"
             },
             "problemMatcher": [],
             "group": {

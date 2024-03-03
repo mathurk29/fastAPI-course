@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-database_type = "postgressql"
+database_type = "postgresql"
 db_username = "postgres"
 db_password = "passwd"
 db_IP_address = "localhost"
