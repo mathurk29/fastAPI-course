@@ -1,24 +1,27 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+
+from databases.database_sqlalchemy import SessionLocal, get_db
 
 # from database_es import wsl_elasticsearch
 from databases.model import PostsBase, postgres_connection, postgres_cursor
 
-router = APIRouter()
+CRUD = APIRouter()
 
 
-@router.get("/")
+@CRUD.get("/")
 def root():
     return {"OK"}
 
 
-@router.get("/posts")
+@CRUD.get("/posts")
 def get_posts():
     postgres_cursor.execute(""" SELECT * FROM posts""")
     posts = postgres_cursor.fetchall()
     return posts
 
 
-@router.get("/posts/{id}")
+@CRUD.get("/posts/{id}")
 def get_posts_id(id: int):
 
     postgres_cursor.execute("""SELECT * FROM posts WHERE id = %s""", (str(id),))
@@ -31,7 +34,7 @@ def get_posts_id(id: int):
     return post
 
 
-@router.post("/posts", status_code=status.HTTP_201_CREATED)
+@CRUD.post("/posts", status_code=status.HTTP_201_CREATED)
 def create_posts(post: PostsBase):
     postgres_cursor.execute(
         """ INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING id""",
@@ -42,7 +45,7 @@ def create_posts(post: PostsBase):
     return f"Your post is successfully registered at index: {idx}"
 
 
-@router.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@CRUD.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete(id: int):
     postgres_cursor.execute(
         """ DELETE FROM posts WHERE id = %s RETURNING id""", (str(id),)
@@ -57,7 +60,7 @@ def delete(id: int):
     postgres_connection.commit()
 
 
-@router.put("/posts/{id}", status_code=status.HTTP_201_CREATED)
+@CRUD.put("/posts/{id}", status_code=status.HTTP_201_CREATED)
 def update_post(id: int, post: PostsBase):
     postgres_cursor.execute(
         """ UPDATE posts SET title = %s, content = %s, published=%s WHERE id = %s RETURNING id""",
@@ -76,3 +79,8 @@ def update_post(id: int, post: PostsBase):
             detail=f"Post with {id} not avaialbe.",
         )
     return f"Updated post with id: {id}"
+
+
+@CRUD.get("/sqlalchemy_test")
+def test_posts(db: Session = Depends(get_db)):
+    return "Success"

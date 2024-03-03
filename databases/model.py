@@ -3,7 +3,7 @@ import time
 import psycopg2
 from psycopg2.extras import DictCursor
 from pydantic import BaseModel
-from sqlalchemy import Boolean, Column, Integer, String
+from sqlalchemy import TIMESTAMP, Boolean, Column, Integer, String, text
 
 from .database_sqlalchemy import Base
 
@@ -27,12 +27,6 @@ while True:
         print("Error: ", error)
         time.sleep(2)
 
-# Execute a query
-postgres_cursor.execute("SELECT * FROM posts")
-
-# Retrieve query results
-records = postgres_cursor.fetchall()
-
 
 class PostsBase(BaseModel):
     title: str
@@ -46,4 +40,5 @@ class Posts(Base):
     id = Column(Integer, primary_key=True, nullable=False)
     title = Column(String, nullable=False)
     content = Column(String, nullable=False)
-    published = Column(Boolean, default=True)
+    published = Column(Boolean, server_default="TRUE")
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text("NOW()"))
