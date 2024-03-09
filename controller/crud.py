@@ -16,15 +16,16 @@ def root():
 def get_posts(db: Session = Depends(get_db)):
     # postgres_cursor.execute(""" SELECT * FROM posts""")
     # posts = postgres_cursor.fetchall()
-    posts = db.query(model.Post)
-    return posts
+    posts = db.query(model.Posts)
+    return posts.all()
 
 
 @CRUD.get("/posts/{id}")
-def get_posts_id(id: int):
+def get_posts_id(id: int, db: Session = Depends(get_db)):
 
-    model.postgres_cursor.execute("""SELECT * FROM posts WHERE id = %s""", (str(id),))
-    post = model.postgres_cursor.fetchone()
+    # model.postgres_cursor.execute("""SELECT * FROM posts WHERE id = %s""", (str(id),))
+    # post = model.postgres_cursor.fetchone()
+    post = db.query(model.Posts).filter(model.Posts.id == id).first()
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -34,50 +35,61 @@ def get_posts_id(id: int):
 
 
 @CRUD.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_posts(post: model.PostsBase):
-    model.postgres_cursor.execute(
-        """ INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING id""",
-        (post.title, post.content, post.published),
-    )
-    idx = model.postgres_cursor.fetchone()[0]
-    model.postgres_connection.commit()
-    return f"Your post is successfully registered at index: {idx}"
+def create_posts(post: model.PostsBase, db: Session = Depends(get_db)):
+    # model.postgres_cursor.execute(
+    #     """ INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING id""",
+    #     (post.title, post.content, post.published),
+    # )
+    # idx = model.postgres_cursor.fetchone()[0]
+    # model.postgres_connection.commit()
+    new_post = model.Posts(**post.model_dump())
+    db.add(new_post)
+    db.commit()
+    db.refresh(new_post)
+
+    return f"Your post is successfully registered at index: {new_post.id}"
 
 
 @CRUD.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete(id: int):
-    model.postgres_cursor.execute(
-        """ DELETE FROM posts WHERE id = %s RETURNING id""", (str(id),)
-    )
-    temp = model.postgres_cursor.fetchone()
-    if temp is None:
+def delete(id: int, db: Session = Depends(get_db)):
+    # model.postgres_cursor.execute(
+    #     """ DELETE FROM posts WHERE id = %s RETURNING id""", (str(id),)
+    # )
+    # temp = model.postgres_cursor.fetchone()
+    posts = db.query(model.Posts).filter(model.Posts.id == id)
+    if posts.first() is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Post with {id} not found.",
         )
-    deleted_post_id = temp[0]
-    model.postgres_connection.commit()
+    posts.delete(synchronize_session=False)
+    db.commit()
 
 
 @CRUD.put("/posts/{id}", status_code=status.HTTP_201_CREATED)
-def update_post(id: int, post: model.PostsBase):
-    model.postgres_cursor.execute(
-        """ UPDATE posts SET title = %s, content = %s, published=%s WHERE id = %s RETURNING id""",
-        (
-            post.title,
-            post.content,
-            post.published,
-            str(id),
-        ),
-    )
-    updated_post_id = model.postgres_cursor.fetchone()
-    model.postgres_connection.commit()
-    if updated_post_id is None:
+def update_post(id: int, post: model.PostsBase, db: Session = Depends(get_db)):
+    # model.postgres_cursor.execute(
+    #     """ UPDATE posts SET title = %s, content = %s, published=%s WHERE id = %s RETURNING id""",
+    #     (
+    #         post.title,
+    #         post.content,
+    #         post.published,
+    #         str(id),
+    #     ),
+    # )
+    # updated_post_id = model.postgres_cursor.fetchone()
+    # model.postgres_connection.commit()
+    update_query = db.query(model.Posts).filter(model.Posts.id == id)
+    updated_post = update_query.first()
+    if updated_post == None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Post with {id} not avaialbe.",
         )
-    return f"Updated post with id: {id}"
+    update_query.update(post.model_dump(), synchronize_session=False)
+    db.commit()
+    db.refresh(updated_post)
+    return f"Updated post: {updated_post.id}"
 
 
 @CRUD.get("/sqlalchemy_test")
