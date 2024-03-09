@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -12,15 +14,15 @@ def root():
     return {"OK"}
 
 
-@CRUD.get("/posts")
+@CRUD.get("/posts", response_model=List[schemas.Posts])
 def get_posts(db: Session = Depends(get_db)):
     # postgres_cursor.execute(""" SELECT * FROM posts""")
     # posts = postgres_cursor.fetchall()
-    posts = db.query(model.Posts)
-    return posts.all()
+    posts = db.query(model.Posts).all()
+    return posts
 
 
-@CRUD.get("/posts/{id}")
+@CRUD.get("/posts/{id}", response_model=schemas.Posts)
 def get_posts_id(id: int, db: Session = Depends(get_db)):
 
     # model.postgres_cursor.execute("""SELECT * FROM posts WHERE id = %s""", (str(id),))
@@ -34,8 +36,8 @@ def get_posts_id(id: int, db: Session = Depends(get_db)):
     return post
 
 
-@CRUD.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_posts(post: schemas.PostsCreate, db: Session = Depends(get_db)):
+@CRUD.post("/posts", status_code=status.HTTP_201_CREATED, response_model=schemas.Posts)
+def create_posts(post: schemas.PostsBase, db: Session = Depends(get_db)):
     # model.postgres_cursor.execute(
     #     """ INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING id""",
     #     (post.title, post.content, post.published),
@@ -47,7 +49,7 @@ def create_posts(post: schemas.PostsCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_post)
 
-    return f"Your post is successfully registered at index: {new_post.id}"
+    return new_post
 
 
 @CRUD.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -66,8 +68,10 @@ def delete(id: int, db: Session = Depends(get_db)):
     db.commit()
 
 
-@CRUD.put("/posts/{id}", status_code=status.HTTP_201_CREATED)
-def update_post(id: int, post: schemas.PostsCreate, db: Session = Depends(get_db)):
+@CRUD.put(
+    "/posts/{id}", status_code=status.HTTP_201_CREATED, response_model=schemas.Posts
+)
+def update_post(id: int, post: schemas.PostsBase, db: Session = Depends(get_db)):
     # model.postgres_cursor.execute(
     #     """ UPDATE posts SET title = %s, content = %s, published=%s WHERE id = %s RETURNING id""",
     #     (
@@ -89,7 +93,7 @@ def update_post(id: int, post: schemas.PostsCreate, db: Session = Depends(get_db
     update_query.update(post.model_dump(), synchronize_session=False)
     db.commit()
     db.refresh(updated_post)
-    return f"Updated post: {updated_post.id}"
+    return updated_post
 
 
 @CRUD.get("/sqlalchemy_test")
