@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from databases import model
+from databases import model, schemas
 from databases.database_sqlalchemy import get_db
 
 CRUD = APIRouter()
@@ -35,7 +35,7 @@ def get_posts_id(id: int, db: Session = Depends(get_db)):
 
 
 @CRUD.post("/posts", status_code=status.HTTP_201_CREATED)
-def create_posts(post: model.PostsBase, db: Session = Depends(get_db)):
+def create_posts(post: schemas.PostsCreate, db: Session = Depends(get_db)):
     # model.postgres_cursor.execute(
     #     """ INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING id""",
     #     (post.title, post.content, post.published),
@@ -67,7 +67,7 @@ def delete(id: int, db: Session = Depends(get_db)):
 
 
 @CRUD.put("/posts/{id}", status_code=status.HTTP_201_CREATED)
-def update_post(id: int, post: model.PostsBase, db: Session = Depends(get_db)):
+def update_post(id: int, post: schemas.PostsCreate, db: Session = Depends(get_db)):
     # model.postgres_cursor.execute(
     #     """ UPDATE posts SET title = %s, content = %s, published=%s WHERE id = %s RETURNING id""",
     #     (

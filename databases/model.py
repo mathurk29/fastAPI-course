@@ -2,7 +2,6 @@ import time
 
 import psycopg2
 from psycopg2.extras import DictCursor
-from pydantic import BaseModel
 from sqlalchemy import TIMESTAMP, Boolean, Column, Integer, String, text
 
 from .database_sqlalchemy import Base
@@ -26,12 +25,6 @@ while True:
         print("Postgres connection failed")
         print("Error: ", error)
         time.sleep(2)
-
-
-class PostsBase(BaseModel):
-    title: str
-    content: str
-    published: bool = True
 
 
 class Posts(Base):
