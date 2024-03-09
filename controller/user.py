@@ -8,11 +8,11 @@ import utils
 from databases import models, schemas
 from databases.database_sqlalchemy import get_db
 
-user_router = APIRouter()
+user_router = APIRouter(prefix="/users", tags=["users"])
 
 
 @user_router.post(
-    "/user", status_code=status.HTTP_201_CREATED, response_model=schemas.UserResponse
+    "/", status_code=status.HTTP_201_CREATED, response_model=schemas.UserResponse
 )
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     user.password = utils.create_password_hash(user.password)
@@ -26,7 +26,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return new_user
 
 
-@user_router.get("/user/{id}", response_model=schemas.UserResponse)
+@user_router.get("/{id}", response_model=schemas.UserResponse)
 def get_user(id: int, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.id == id).first()
     if not user:

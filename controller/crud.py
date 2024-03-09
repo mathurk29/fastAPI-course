@@ -6,15 +6,10 @@ from sqlalchemy.orm import Session
 from databases import models, schemas
 from databases.database_sqlalchemy import get_db
 
-crud_router = APIRouter()
+crud_router = APIRouter(prefix="/posts", tags=["posts"])
 
 
-@crud_router.get("/")
-def root():
-    return {"OK"}
-
-
-@crud_router.get("/posts", response_model=List[schemas.Posts])
+@crud_router.get("/", response_model=List[schemas.Posts])
 def get_posts(db: Session = Depends(get_db)):
     # postgres_cursor.execute(""" SELECT * FROM posts""")
     # posts = postgres_cursor.fetchall()
@@ -22,7 +17,7 @@ def get_posts(db: Session = Depends(get_db)):
     return posts
 
 
-@crud_router.get("/posts/{id}", response_model=schemas.Posts)
+@crud_router.get("/{id}", response_model=schemas.Posts)
 def get_posts_id(id: int, db: Session = Depends(get_db)):
 
     # model.postgres_cursor.execute("""SELECT * FROM posts WHERE id = %s""", (str(id),))
@@ -37,7 +32,7 @@ def get_posts_id(id: int, db: Session = Depends(get_db)):
 
 
 @crud_router.post(
-    "/posts", status_code=status.HTTP_201_CREATED, response_model=schemas.Posts
+    "/", status_code=status.HTTP_201_CREATED, response_model=schemas.Posts
 )
 def create_posts(post: schemas.PostsBase, db: Session = Depends(get_db)):
     # model.postgres_cursor.execute(
@@ -54,7 +49,7 @@ def create_posts(post: schemas.PostsBase, db: Session = Depends(get_db)):
     return new_post
 
 
-@crud_router.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@crud_router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete(id: int, db: Session = Depends(get_db)):
     # model.postgres_cursor.execute(
     #     """ DELETE FROM posts WHERE id = %s RETURNING id""", (str(id),)
@@ -71,7 +66,7 @@ def delete(id: int, db: Session = Depends(get_db)):
 
 
 @crud_router.put(
-    "/posts/{id}", status_code=status.HTTP_201_CREATED, response_model=schemas.Posts
+    "/{id}", status_code=status.HTTP_201_CREATED, response_model=schemas.Posts
 )
 def update_post(id: int, post: schemas.PostsBase, db: Session = Depends(get_db)):
     # model.postgres_cursor.execute(
@@ -96,9 +91,3 @@ def update_post(id: int, post: schemas.PostsBase, db: Session = Depends(get_db))
     db.commit()
     db.refresh(updated_post)
     return updated_post
-
-
-@crud_router.get("/sqlalchemy_test")
-def test_posts(db: Session = Depends(get_db)):
-    posts = db.query(models.Posts).all()
-    return posts
