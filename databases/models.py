@@ -4,7 +4,7 @@ import time
 
 import psycopg2
 from psycopg2.extras import DictCursor
-from sqlalchemy import TIMESTAMP, Boolean, Column, Integer, String, text
+from sqlalchemy import TIMESTAMP, Boolean, Column, ForeignKey, Integer, String, text
 
 from .database_sqlalchemy import Base
 
@@ -39,10 +39,13 @@ class Posts(Base):
     created_at = Column(
         TIMESTAMP(timezone=True), server_default=text("NOW()"), nullable=False
     )
+    owner_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
 
 
 class User(Base):
-    __tablename__ = "user"
+    __tablename__ = "users"
     id = Column(Integer, primary_key=True, nullable=False)
     email = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)

@@ -44,4 +44,4 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exceptions = HTTPException(
         status_code=status.HTTP_403_FORBIDDEN, detail="Invalid credentials"
     )
-    verify_access_token(token, credentials_exceptions)
+    return verify_access_token(token, credentials_exceptions)

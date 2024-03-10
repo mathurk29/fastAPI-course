@@ -42,7 +42,7 @@ def get_posts_id(
 def create_posts(
     post: schemas.PostsBase,
     db: Session = Depends(get_db),
-    user_id: int = Depends(oauth2.get_current_user),
+    current_user: int = Depends(oauth2.get_current_user),
 ):
     # model.postgres_cursor.execute(
     #     """ INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING id""",
@@ -50,7 +50,7 @@ def create_posts(
     # )
     # idx = model.postgres_cursor.fetchone()[0]
     # model.postgres_connection.commit()
-    new_post = models.Posts(**post.model_dump())
+    new_post = models.Posts(owner_id=current_user.id, **post.model_dump())
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
