@@ -1,6 +1,7 @@
 # Pydantic schemas for Request-Response Validation.
 
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel, EmailStr
 
@@ -28,3 +29,12 @@ class UserResponse(BaseModel):
     id: int
     email: EmailStr
     created_at: datetime
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenPayload(BaseModel):
+    id: Optional[str] = None
