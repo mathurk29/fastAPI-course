@@ -37,4 +37,4 @@ class Token(BaseModel):
 
 
 class TokenPayload(BaseModel):
-    id: Optional[str] = None
+    id: Optional[int] = None

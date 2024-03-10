@@ -3,6 +3,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
+import oauth2
 from databases import models, schemas
 from databases.database_sqlalchemy import get_db
 
@@ -18,7 +19,11 @@ def get_posts(db: Session = Depends(get_db)):
 
 
 @crud_router.get("/{id}", response_model=schemas.Posts)
-def get_posts_id(id: int, db: Session = Depends(get_db)):
+def get_posts_id(
+    id: int,
+    db: Session = Depends(get_db),
+    user_id: int = Depends(oauth2.get_current_user),
+):
 
     # model.postgres_cursor.execute("""SELECT * FROM posts WHERE id = %s""", (str(id),))
     # post = model.postgres_cursor.fetchone()
@@ -34,7 +39,11 @@ def get_posts_id(id: int, db: Session = Depends(get_db)):
 @crud_router.post(
     "/", status_code=status.HTTP_201_CREATED, response_model=schemas.Posts
 )
-def create_posts(post: schemas.PostsBase, db: Session = Depends(get_db)):
+def create_posts(
+    post: schemas.PostsBase,
+    db: Session = Depends(get_db),
+    user_id: int = Depends(oauth2.get_current_user),
+):
     # model.postgres_cursor.execute(
     #     """ INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING id""",
     #     (post.title, post.content, post.published),
@@ -50,7 +59,11 @@ def create_posts(post: schemas.PostsBase, db: Session = Depends(get_db)):
 
 
 @crud_router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete(id: int, db: Session = Depends(get_db)):
+def delete(
+    id: int,
+    db: Session = Depends(get_db),
+    user_id: int = Depends(oauth2.get_current_user),
+):
     # model.postgres_cursor.execute(
     #     """ DELETE FROM posts WHERE id = %s RETURNING id""", (str(id),)
     # )
@@ -68,7 +81,12 @@ def delete(id: int, db: Session = Depends(get_db)):
 @crud_router.put(
     "/{id}", status_code=status.HTTP_201_CREATED, response_model=schemas.Posts
 )
-def update_post(id: int, post: schemas.PostsBase, db: Session = Depends(get_db)):
+def update_post(
+    id: int,
+    post: schemas.PostsBase,
+    db: Session = Depends(get_db),
+    user_id: int = Depends(oauth2.get_current_user),
+):
     # model.postgres_cursor.execute(
     #     """ UPDATE posts SET title = %s, content = %s, published=%s WHERE id = %s RETURNING id""",
     #     (

@@ -31,7 +31,7 @@ def create_access_token(payload: dict):
 def verify_access_token(token: str, credentials_exceptions):
     try:
         paylaod = jwt.decode(token, SECRTE_KEY, algorithms=[ALGORITHM])
-        id: str = paylaod.get("user_id")
+        id: int = paylaod.get("user_id")
         if id is None:
             raise credentials_exceptions
         token_data = schemas.TokenPayload(id=id)
