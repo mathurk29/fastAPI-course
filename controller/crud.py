@@ -22,7 +22,7 @@ def get_posts(db: Session = Depends(get_db)):
 def get_posts_id(
     id: int,
     db: Session = Depends(get_db),
-    user_id: int = Depends(oauth2.get_current_user),
+    current_user: int = Depends(oauth2.get_current_user),
 ):
 
     # model.postgres_cursor.execute("""SELECT * FROM posts WHERE id = %s""", (str(id),))
@@ -62,19 +62,22 @@ def create_posts(
 def delete(
     id: int,
     db: Session = Depends(get_db),
-    user_id: int = Depends(oauth2.get_current_user),
+    current_user: int = Depends(oauth2.get_current_user),
 ):
     # model.postgres_cursor.execute(
     #     """ DELETE FROM posts WHERE id = %s RETURNING id""", (str(id),)
     # )
     # temp = model.postgres_cursor.fetchone()
-    posts = db.query(models.Posts).filter(models.Posts.id == id)
-    if posts.first() is None:
+    post_query = db.query(models.Posts).filter(models.Posts.id == id)
+    post = post_query.first()
+    if post is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Post with {id} not found.",
         )
-    posts.delete(synchronize_session=False)
+    if post.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
+    post_query.delete(synchronize_session=False)
     db.commit()
 
 
@@ -85,7 +88,7 @@ def update_post(
     id: int,
     post: schemas.PostsBase,
     db: Session = Depends(get_db),
-    user_id: int = Depends(oauth2.get_current_user),
+    current_user: int = Depends(oauth2.get_current_user),
 ):
     # model.postgres_cursor.execute(
     #     """ UPDATE posts SET title = %s, content = %s, published=%s WHERE id = %s RETURNING id""",
@@ -105,6 +108,8 @@ def update_post(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Post with {id} not avaialbe.",
         )
+    if updated_post.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
     update_query.update(post.model_dump(), synchronize_session=False)
     db.commit()
     db.refresh(updated_post)
