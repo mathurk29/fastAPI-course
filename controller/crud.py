@@ -11,10 +11,18 @@ crud_router = APIRouter(prefix="/posts", tags=["posts"])
 
 
 @crud_router.get("/", response_model=List[schemas.Posts])
-def get_posts(db: Session = Depends(get_db)):
+def get_posts(
+    db: Session = Depends(get_db), limit: int = 10, skip: int = 0, search: str = ""
+):
     # postgres_cursor.execute(""" SELECT * FROM posts""")
     # posts = postgres_cursor.fetchall()
-    posts = db.query(models.Posts).all()
+    posts = (
+        db.query(models.Posts)
+        .filter(models.Posts.content.contains(search))
+        .limit(limit)
+        .offset(skip)
+        .all()
+    )
     return posts
 
 
