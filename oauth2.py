@@ -1,9 +1,11 @@
+import imp
 from datetime import datetime, timedelta, timezone
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 
+from config import settings
 from databases import schemas
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
@@ -15,9 +17,9 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 # to get a string like this run:
 # openssl rand -hex 32
-SECRTE_KEY = "71d9c2db8acb64e6a7e0cb6bfff07c4e2f10a819108fa1ad49bb0862c2a42fcf"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRTE_KEY = settings.SECRTE_KEY
+ALGORITHM = settings.ALGORITHM
+ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
 
 
 def create_access_token(payload: dict):
