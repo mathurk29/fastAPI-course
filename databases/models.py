@@ -1,33 +1,31 @@
 # SQLAlchemy models to interact with db.
-
-import time
-
-import psycopg2
-from psycopg2.extras import DictCursor
 from sqlalchemy import TIMESTAMP, Boolean, Column, ForeignKey, Integer, String, text
 from sqlalchemy.orm import relationship
 
 from .database_sqlalchemy import Base
 
-while True:
-    try:
-        # Connect to your postgres DB
-        postgres_connection = psycopg2.connect(
-            database="fastapi",
-            user="postgres",
-            password="passwd",
-            cursor_factory=DictCursor,
-        )
+# import psycopg2
+# from psycopg2.extras import DictCursor
+# import time
+# while True:
+#     try:
+#         # Connect to your postgres DB
+#         postgres_connection = psycopg2.connect(
+#             database="fastapi",
+#             user="postgres",
+#             password="passwd",
+#             cursor_factory=DictCursor,
+#         )
 
-        # Open a cursor to perform database operations
-        postgres_cursor = postgres_connection.cursor()
-        print("Postgress connected")
-        break
+#         # Open a cursor to perform database operations
+#         postgres_cursor = postgres_connection.cursor()
+#         print("Postgress connected")
+#         break
 
-    except Exception as error:
-        print("Postgres connection failed")
-        print("Error: ", error)
-        time.sleep(2)
+#     except Exception as error:
+#         print("Postgres connection failed")
+#         print("Error: ", error)
+#         time.sleep(2)
 
 
 class User(Base):
@@ -54,3 +52,20 @@ class Posts(Base):
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     owner = relationship(User)
+
+
+class Vote(Base):
+    __tablename__ = "votes"
+
+    post_id = Column(
+        Integer,
+        ForeignKey("posts.id", ondelete="cascade"),
+        primary_key=True,
+        nullable=False,
+    )
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id", ondelete="cascade"),
+        primary_key=True,
+        nullable=False,
+    )

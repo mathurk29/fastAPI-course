@@ -13,6 +13,7 @@ SessionLocal = sessionmaker(
     autoflush=False,
     bind=engine,
 )
+print("Postgress connected")
 Base = declarative_base()
 
 
