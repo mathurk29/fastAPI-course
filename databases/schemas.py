@@ -6,6 +6,17 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr
 
 
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class UserResponse(BaseModel):
+    id: int
+    email: EmailStr
+    created_at: datetime
+
+
 class PostsBase(BaseModel):
     title: str
     content: str
@@ -16,20 +27,10 @@ class Posts(PostsBase):
     id: int
     created_at: datetime
     owner_id: int
+    owner: UserResponse
 
     class Config:
         from_attributes = True
-
-
-class UserCreate(BaseModel):
-    email: EmailStr
-    password: str
-
-
-class UserResponse(BaseModel):
-    id: int
-    email: EmailStr
-    created_at: datetime
 
 
 class Token(BaseModel):
