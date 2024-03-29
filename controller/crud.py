@@ -31,7 +31,7 @@ def get_posts(
     return posts
 
 
-@crud_router.get("/{id}", response_model=schemas.Posts)
+@crud_router.get("/{id}", response_model=schemas.PostsOut)
 def get_posts_id(
     id: int,
     db: Session = Depends(get_db),
@@ -40,7 +40,13 @@ def get_posts_id(
 
     # model.postgres_cursor.execute("""SELECT * FROM posts WHERE id = %s""", (str(id),))
     # post = model.postgres_cursor.fetchone()
-    post = db.query(models.Posts).filter(models.Posts.id == id).first()
+    post = (
+        db.query(models.Posts, func.count(models.Vote.post_id).label("votes"))
+        .join(models.Vote, models.Posts.id == models.Vote.post_id, isouter=True)
+        .group_by(models.Posts.id)
+        .filter(models.Posts.id == id)
+        .first()
+    )
     if not post:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
