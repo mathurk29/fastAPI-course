@@ -33,6 +33,11 @@ class Posts(PostsBase):
         from_attributes = True
 
 
+class PostsOut(BaseModel):
+    Posts: Posts
+    votes: int
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str
