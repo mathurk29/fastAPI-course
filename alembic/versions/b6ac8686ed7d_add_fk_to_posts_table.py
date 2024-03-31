@@ -5,22 +5,32 @@ Revises: 0add1905a4b6
 Create Date: 2024-03-31 18:40:47.267370
 
 """
+
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = 'b6ac8686ed7d'
-down_revision: Union[str, None] = '0add1905a4b6'
+revision: str = "b6ac8686ed7d"
+down_revision: Union[str, None] = "0add1905a4b6"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    pass
+    op.add_column("posts", sa.Column("owner_id", sa.Integer(), nullable=False))
+    op.create_foreign_key(
+        "posts_users_fk",
+        source_table="posts",
+        referent_table="users",
+        local_cols=["owner_id"],
+        remote_cols=["id"],
+        ondelete="CASCADE",
+    )
 
 
 def downgrade() -> None:
-    pass
+    op.drop_constraint("posts_users_fk", table_name="posts")
+    op.drop_column("posts", "owner_id")
