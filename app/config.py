@@ -3,6 +3,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     database_type: str
+    database_engine: str
     DB_USERNAME: str
     DB_PASSWORD: str
     DB_HOSTNAME: str

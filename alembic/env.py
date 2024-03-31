@@ -9,10 +9,11 @@ from alembic import context
 config = context.config
 from app.config import settings
 
-config.get_main_option(
+config.set_main_option(
     "sqlalchemy.url",
-    f"{settings.database_type}://{settings.DB_USERNAME}:{settings.DB_PASSWORD}@{settings.DB_HOSTNAME}:{settings.DB_PORT}/{settings.DATABASE_NAME}",
+    f"{settings.database_type}+{settings.database_engine}://{settings.DB_USERNAME}:{settings.DB_PASSWORD}@{settings.DB_HOSTNAME}:{settings.DB_PORT}/{settings.DATABASE_NAME}",
 )
+
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -23,7 +24,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from databases.models import Base
+from app.databases.models import Base
 
 target_metadata = Base.metadata
 
