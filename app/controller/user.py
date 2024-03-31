@@ -1,12 +1,12 @@
 from typing import List
 
 import sqlalchemy
+from databases import models, schemas
+from databases.database_sqlalchemy import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-import utils
-from databases import models, schemas
-from databases.database_sqlalchemy import get_db
+import app.utils as utils
 
 user_router = APIRouter(prefix="/users", tags=["users"])
 

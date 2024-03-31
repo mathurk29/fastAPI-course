@@ -1,13 +1,13 @@
 from ast import mod
 from typing import List
 
+from databases import models, schemas
+from databases.database_sqlalchemy import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-import oauth2
-from databases import models, schemas
-from databases.database_sqlalchemy import get_db
+import app.oauth2 as oauth2
 
 crud_router = APIRouter(prefix="/posts", tags=["posts"])
 
