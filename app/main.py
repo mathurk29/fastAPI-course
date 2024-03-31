@@ -1,12 +1,11 @@
-from fastapi import FastAPI
-
 from controller.auth import login_router
 from controller.crud import crud_router
 from controller.user import user_router
 from controller.vote import vote_router
 from databases import database_sqlalchemy, models
+from fastapi import FastAPI
 
-models.Base.metadata.create_all(bind=database_sqlalchemy.engine)
+# models.Base.metadata.create_all(bind=database_sqlalchemy.engine)
 
 app = FastAPI()
 
