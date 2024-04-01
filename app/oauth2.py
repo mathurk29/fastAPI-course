@@ -1,12 +1,11 @@
 import imp
 from datetime import datetime, timedelta, timezone
 
+from config import settings
 from databases import schemas
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-
-from app.config import settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
