@@ -1,7 +1,8 @@
-import oauth2 as oauth2
-from databases import database_sqlalchemy, models, schemas
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+
+from .. import oauth2 as oauth2
+from ..databases import database_sqlalchemy, models, schemas
 
 vote_router = APIRouter(tags=["Vote"], prefix="/vote")
 

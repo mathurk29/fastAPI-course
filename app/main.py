@@ -1,16 +1,17 @@
-from controller.auth import login_router
-from controller.crud import crud_router
-from controller.user import user_router
-from controller.vote import vote_router
-from databases import database_sqlalchemy, models
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from .controller.auth import login_router
+from .controller.crud import crud_router
+from .controller.user import user_router
+from .controller.vote import vote_router
+from .databases import database_sqlalchemy, models
 
 # models.Base.metadata.create_all(bind=database_sqlalchemy.engine)
 
 app = FastAPI()
 
-origins = ["https://www.localhost.com/"]
+origins = ["https://www.localhost.com/", "https://0.0.0.0/"]
 
 app.add_middleware(
     CORSMiddleware,

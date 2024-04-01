@@ -1,11 +1,10 @@
-from typing import List
-
 import sqlalchemy
-import utils as utils
-from databases import models, schemas
-from databases.database_sqlalchemy import get_db
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+
+from .. import utils as utils
+from ..databases import models, schemas
+from ..databases.database_sqlalchemy import get_db
 
 user_router = APIRouter(prefix="/users", tags=["users"])
 
