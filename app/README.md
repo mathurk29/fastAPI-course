@@ -27,27 +27,22 @@ docker pull docker.elastic.co/kibana/kibana:8.12.2
 docker run --name kib01 --net elastic -p 5601:5601 docker.elastic.co/kibana/kibana:8.12.2
 
 
+# Setup new DB
+alembic upgrade head
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Useful Heroku command
+heroku login
+heroku create
+git push heroku main
+heroku open
+heroku logs --tail
+heroku run python manage.py shell
+heroku run bash
+heroku addons:create heroku-postgresql:mini
+heroku addons:destroy heroku-postgresql
+heroku apps:destroy
+heroku addons --all
+heroku apps --all
 
 
 
@@ -62,6 +57,3 @@ Password for the elastic user (reset with `bin/elasticsearch-reset-password -u e
 • Copy the following enrollment token and paste it into Kibana in your browser (valid for the next 30 minutes):
   eyJ2ZXIiOiI4LjEyLjIiLCJhZHIiOlsiMTcyLjE4LjAuMjo5MjAwIl0sImZnciI6ImIzYTFiYjA5NjdhOTUzODQwOWVjN2M0M2MyMWYyZTgyZmE0MDY3ZWRjODhlNzMwZmIzMzY1MTRiY2MzMzMwMmQiLCJrZXkiOiJXSHlUQUk0QjJCN2hZSTI2SHNsWTpKNk1uNy1Fb1JwU3pYUjJzYWEtTXpBIn0=
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-
-
