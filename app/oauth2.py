@@ -1,4 +1,3 @@
-import imp
 from datetime import datetime, timedelta, timezone
 
 from config import settings
