@@ -11,7 +11,7 @@ from app.config import settings
 
 config.set_main_option(
     "sqlalchemy.url",
-    f"{settings.database_type}+{settings.database_engine}://{settings.DB_USERNAME}:{settings.DB_PASSWORD}@{settings.DB_HOSTNAME}:{settings.DB_PORT}/{settings.DATABASE_NAME}",
+    f"{settings.database_type}{'+'+settings.database_engine if settings.database_engine else '' }://{settings.DB_USERNAME}:{settings.DB_PASSWORD}@{settings.DB_HOSTNAME}:{settings.DB_PORT}/{settings.DATABASE_NAME}",
 )
 
 
