@@ -156,3 +156,40 @@ sudo systemctl start api
 sudo systemctl status api
 sudo systemctl enable api # to enable auto statup on reboot
 ```
+
+### Nginx
+```bash
+sudo apt install nginx
+systemctl start nginx # open server IP - will show nginx home page from /var/www/html - set in below config file
+cd /etc/nginx/sites-available
+cat default
+vi default
+    # copy content to server localtion from:
+```
+reference file: [nginx](../nginx)
+
+
+### Install certificates for https
+sudo snap install --classic certbot
+sudo certbot --nginx
+
+### Firewall
+```bash
+sudo ufw status
+sudo ufw allow http 
+sudo ufw allow https
+sudo ufw allow ssh
+sudo ufw allow 5432 # for connecting to postgres - but highly risky as it opens up access to DB
+sudo ufw enable
+```
+
+
+### Push changes
+
+```bash
+cd project folder
+git pull 
+sudo systemctl restart api
+```
+
+
