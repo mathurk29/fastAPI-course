@@ -2,6 +2,7 @@
 
 ## [Install Elasticsearch with Docker](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html)
 
+```bash
 sudo sysctl -w vm.max_map_count=262144
 
 docker network rm elastic
@@ -25,7 +26,7 @@ curl --cacert http_ca.crt -u elastic:$ELASTIC_PASSWORD https://localhost:9200
 docker pull docker.elastic.co/kibana/kibana:8.12.2
 
 docker run --name kib01 --net elastic -p 5601:5601 docker.elastic.co/kibana/kibana:8.12.2
-
+```
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -36,6 +37,7 @@ config db in code and run
 `alembic upgrade head`
 
 ## Heroku Steps
+```bash
 heroku login\
 heroku create\
 git push heroku main\
@@ -48,7 +50,7 @@ heroku addons:destroy heroku-postgresql\
 heroku apps:destroy\
 heroku addons --all\
 heroku apps --all
-
+```
 
 ## Ubuntu Prod Setup
 
@@ -93,7 +95,7 @@ psql
 ```
 
 config remote auth and remove peer auth
-```
+```bash
 cd /etc/postgresql/15/main/
 
 vi postgresql.conf
@@ -109,6 +111,48 @@ refer:
 [postgresql.conf](../postgresql.conf)
 
 `systemctl restart postgresql`
+```bash
+psql -U potgress
+adduser kshitij # created new user in postgress which also created in the ubuntu
+su kshitij # created non root user to access prod db server
+usermod -aG sudo kshitij # give sudo access to kshitij
+ssh kshitij@<IPaddrr> #connect to Ubuntu machine (droplet) at it's IP addr using PgAdmin
+sudo apt upgrade
+cd /home/kshitij
+mkdir app
+virtualenv venv
+source venv/bin/activate
+mkdir src
+git clone <git url>
+pip install -r requirements.txt
+```
+
+### Set environment vars
+
+create .env file outside of app folder for confidentiality
+```bash
+vi ~/.profile # put below command at end of this to persist in reboots
+set -o allexport ; source <path to .env>; set +o allexport` # command to set env vars from file with syntax var=value. no need of export command
+cd /home/kshitij/app
+alembic upgrade head
+uvicorn --host 0.0.0.0 app.main:app # 0.0.0.0 so that it listen to all request coming at it's IP from outside.
+pip install gunicorn # cause uvicorn won't restart on reboot
+pip install uvloop
+pip install httptools
+guvicorn -w 4 -k uvicorn.workers.UvicornWorker app.main:app  --bind 0.0.0.0:8000 # exposing on 8000 to outside world as it is standard http port 
+ps -aef | grep -i gunicorn # to check 
+```
 
 
-
+### Create service
+```bash
+cd /etc/systemd/system/
+vi api.service
+copy contents of gunicorn.service into api.service
+```
+reference file: [gunicorn.service](../gunicorn.service)
+```bash
+sudo systemctl start api
+sudo systemctl status api
+sudo systemctl enable api # to enable auto statup on reboot
+```
