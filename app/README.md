@@ -1,6 +1,6 @@
 # Setup ElasticSearch and Kibana
 
-https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
+## [Install Elasticsearch with Docker](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html)
 
 sudo sysctl -w vm.max_map_count=262144
 
@@ -18,7 +18,7 @@ docker run --name es01 --net elastic -p 9200:9200 -it -m 1GB docker.elastic.co/e
 
 docker cp es01:/usr/share/elasticsearch/config/certs/http_ca.crt .
 
-export ELASTIC_PASSWORD="<>"
+export ELASTIC_PASSWORD="8re0N-fHphNhVK*kkPi8"
 
 curl --cacert http_ca.crt -u elastic:$ELASTIC_PASSWORD https://localhost:9200
 
@@ -31,11 +31,11 @@ docker run --name kib01 --net elastic -p 5601:5601 docker.elastic.co/kibana/kiba
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 
-# Setup new DB
+## Setup new DB
 config db in code and run 
 `alembic upgrade head`
 
-# Heroku Steps
+## Heroku Steps
 heroku login\
 heroku create\
 git push heroku main\
@@ -50,7 +50,7 @@ heroku addons --all\
 heroku apps --all
 
 
-# Ubuntu Prod Setup
+## Ubuntu Prod Setup
 
 ```bash
 sudo apt update && sudo apt upgrade
