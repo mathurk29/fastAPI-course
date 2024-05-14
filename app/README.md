@@ -193,3 +193,10 @@ sudo systemctl restart api
 ```
 
 
+## Dockerize the app
+
+### Push to Docker hub
+```bash
+docker image tag fastapi-course_api:latest mathurk29/fastapi-tutorial
+docker push mathurk29/fastapi-tutorial
+```
