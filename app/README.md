@@ -200,3 +200,9 @@ sudo systemctl restart api
 docker image tag fastapi-course_api:latest mathurk29/fastapi-tutorial
 docker push mathurk29/fastapi-tutorial
 ```
+
+
+## Testing
+
+### Fixture
+A func which is run before your test is executed.
