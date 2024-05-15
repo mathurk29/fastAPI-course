@@ -18,7 +18,12 @@ TestingSessionLocal = sessionmaker(
 
 
 # Dependency
-def override_get_db():
+
+
+@pytest.fixture
+def session():
+    models.Base.metadata.drop_all(bind=engine)
+    models.Base.metadata.create_all(bind=engine)
     db = TestingSessionLocal()
     try:
         yield db
@@ -26,18 +31,16 @@ def override_get_db():
         db.close()
 
 
-app.dependency_overrides[get_db] = override_get_db
-
-
 @pytest.fixture
-def client():
-    models.Base.metadata.drop_all(bind=engine)
-    models.Base.metadata.create_all(bind=engine)
+def client(session):
+    def override_get_db():
+        try:
+            yield session
+        finally:
+            session.close()
+
+    app.dependency_overrides[get_db] = override_get_db
     yield TestClient(app)
-    # or you can use alembic
-    # from alembic import command
-    # command.upgrade('head')
-    # command.downgrade('base')
 
 
 def test_root(client):
