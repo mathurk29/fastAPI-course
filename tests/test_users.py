@@ -9,6 +9,7 @@ def test_root(client):
 
 
 def test_create_user(client):
+    # explicily specify trailing slash otherwise the status_code would be 307 Redirect.
     res = client.post("/users/", json={"email": "ksh2@gmail.com", "password": "123"})
     new_user = schemas.UserResponse(**res.json())
     assert new_user.email == "ksh2@gmail.com"
