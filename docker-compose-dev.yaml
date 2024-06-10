@@ -11,7 +11,7 @@ services:
       - database_engine=psycopg2
       - DB_USERNAME=postgres
       - DB_PASSWORD=passwd
-      - DB_HOSTNAME=postgres # DNS will resolve to service mentioned in value
+      - DB_HOSTNAME=postgres # DNS will resolve to service mentioned in value if though we are not exposing the port outside docker.
       - DB_PORT=5432
       - DATABASE_NAME=fastapi
       - SECRTE_KEY=71d9c2db8acb64e6a7e0cb6bfff07c4e2f10a819108fa1ad49bb0862c2a42fcf

@@ -195,6 +195,8 @@ sudo systemctl restart api
 
 ## Dockerize the app
 
+setting `DB_HOSTNAME=postgres` in env var for api service will cause docker's internal  DNS to  resolve postgres service even though we are not exposing the port outside docker.
+
 ### Push to Docker hub
 ```bash
 docker image tag fastapi-course_api:latest mathurk29/fastapi-tutorial
@@ -206,3 +208,5 @@ docker push mathurk29/fastapi-tutorial
 
 ### Fixture
 A func which is run before your test is executed.
+Fixture have scopes - that is when are they run - per test/moduel/package/session 
+Tests should be independent of each other - so define fixtures accordingly.
