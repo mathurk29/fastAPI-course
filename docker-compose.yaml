@@ -11,6 +11,7 @@ services:
       - database_engine=psycopg2
       - DB_USERNAME=postgres
       - DB_PASSWORD=passwd
+      # - DB_HOSTNAME=localhost 
       - DB_HOSTNAME=postgres # DNS will resolve to service mentioned in value if though we are not exposing the port outside docker.
       - DB_PORT=5432
       - DATABASE_NAME=fastapi
@@ -22,14 +23,37 @@ services:
     volumes:
       - ./:/usr/src/app:ro
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    # networks:
+    #   - fastapi_course
     
   postgres:
     image: postgres
+    # ports:
+    #   - 5432:5432
     environment:
       - POSTGRES_PASSWORD=passwd
       - POSTGRES_DB=fastapi
     volumes:
       - postgres-db:/var/lib/posrgresql/data
+    # networks:
+    #   - fastapi_course
+  
+  migrator: 
+    build: 
+      context: .
+      dockerfile: Dockerfile.migrations
+    depends_on: 
+      - postgres
+    volumes: 
+      - ./:/usr/src/app:ro
+    # networks:
+    #   - fastapi_course
+
 
 volumes:
   postgres-db:
+
+# networks:
+#   fastapi_course:
+#     name: fastapi_course
+#     external: true
