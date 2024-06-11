@@ -33,6 +33,14 @@ docker run --name kib01 --net elastic -p 5601:5601 docker.elastic.co/kibana/kiba
 
 
 ## Setup new DB
+
+SQLAlchemy models are designed to interact directly with your database.
+
+Pydantic models are used for data validation and parsing, and do not have a built-in way to interact with databases.
+
+SQLAlchemy models are designed to interact directly with your database.
+Pydantic models are used for data validation and parsing, and do not have a built-in way to interact with databases.
+
 config db in code and run 
 `alembic upgrade head`
 
