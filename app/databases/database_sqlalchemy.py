@@ -9,7 +9,7 @@ SessionLocal = sessionmaker(
     autoflush=False,
     bind=engine,
 )
-print("Postgress connected")
+print(f"Postgress connected at {SQLALCHEMY_DATABASE_URL}")
 Base = declarative_base()
 
 

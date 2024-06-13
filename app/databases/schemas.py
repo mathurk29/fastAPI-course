@@ -29,7 +29,7 @@ class Posts(PostsBase):
     owner_id: int
     owner: UserResponse
 
-    class Config:
+    class ConfigDict:
         from_attributes = True
 
 

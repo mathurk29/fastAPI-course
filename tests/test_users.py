@@ -2,6 +2,19 @@ from app.databases import schemas
 
 from .database import client, session
 
+import pytest
+
+
+@pytest.fixture
+def test_user(client):
+    user_data = {"email": "ksh3@gmail.com", "password": "1234"}
+    res = client.post("/users/", json=user_data)
+
+    assert res.status_code == 201
+    user = res.json()
+    user['password'] = user_data['password']
+    return user
+
 
 def test_root(client):
     res = client.get("/")
@@ -17,7 +30,8 @@ def test_create_user(client):
     assert res.status_code == 201
 
 
-def test_login_user(client):
+def test_login_user(client, test_user):
     # using data as endpoint accepts form data.
-    res = client.post("/login", data={"username": "ksh2@gmail.com", "password": "123"})
+    res = client.post("/login", data={"username": test_user['email'], "password": test_user["password"]})
+    login_res = schemas.Token(**res.json())
     assert res.status_code == 200

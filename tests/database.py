@@ -16,7 +16,7 @@ TestingSessionLocal = sessionmaker(
 )
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def session():
     models.Base.metadata.drop_all(bind=engine)
     models.Base.metadata.create_all(bind=engine)

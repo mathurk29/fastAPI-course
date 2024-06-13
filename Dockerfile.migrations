@@ -5,6 +5,12 @@ WORKDIR /usr/src/app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
+# COPY wait_for.py .
+# RUN python wait_for.py
+
+
 COPY . .
+
+ENTRYPOINT ["python", "wait_for.py"]
 
 CMD [ "alembic", "upgrade", "head" ]
