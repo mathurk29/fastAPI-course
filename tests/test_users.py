@@ -1,8 +1,8 @@
+import pytest
+
 from app.databases import schemas
 
 from .database import client, session
-
-import pytest
 
 
 @pytest.fixture
@@ -34,4 +34,5 @@ def test_login_user(client, test_user):
     # using data as endpoint accepts form data.
     res = client.post("/login", data={"username": test_user['email'], "password": test_user["password"]})
     login_res = schemas.Token(**res.json())
+    
     assert res.status_code == 200

@@ -1,8 +1,9 @@
 # wait_for.py
 import os
 import time
-import psycopg2
 from urllib.parse import urlparse
+
+import psycopg2
 
 RETRIES = 15
 
